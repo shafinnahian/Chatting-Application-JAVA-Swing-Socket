@@ -7,6 +7,9 @@ import java.awt.event.MouseEvent;
 
 public class Server extends JFrame implements ActionListener {
 
+    JTextField text1;
+    JPanel textPanel;
+    Box verticalOutput = Box.createVerticalBox();
     Server(){
         setLayout(null);
 
@@ -16,7 +19,7 @@ public class Server extends JFrame implements ActionListener {
         panelServer.setLayout(null);
         add(panelServer);
 
-        // back logo w/ exit reponse
+        // back logo w/ exit response
         ImageIcon image1 = new ImageIcon(ClassLoader.getSystemResource("images/arrow2.png"));
         Image imageObject = image1.getImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT);   // creating a scaled img object
         ImageIcon imageConverted1 = new ImageIcon(imageObject); // creating a scaled object
@@ -78,11 +81,11 @@ public class Server extends JFrame implements ActionListener {
         panelServer.add(userStatus);
 
         // add texting panel
-        JPanel textPanel = new JPanel();
+        textPanel = new JPanel();
         textPanel.setBounds(5, 75, 425, 570);
         add(textPanel);
 
-        JTextField text1 = new JTextField();    // creates a textfield to write texts
+        text1 = new JTextField();    // creates a textfield to write texts
         text1.setBounds(5, 665, 310, 40);
         text1.setFont(new Font("SAN SERIF", Font.PLAIN, 16));
         add(text1);
@@ -93,6 +96,9 @@ public class Server extends JFrame implements ActionListener {
         send.setBackground(new Color(2, 89, 47));
         send.setForeground(Color.WHITE);
         send.setFont(new Font("Sans Serif", Font.BOLD, 18));
+
+        send.addActionListener(this);
+
         add(send);
 
         setSize(450, 710);
@@ -104,7 +110,24 @@ public class Server extends JFrame implements ActionListener {
     }
 
     public void actionPerformed (ActionEvent ae){
+        String out = text1.getText();
+        JLabel output = new JLabel(out);
+        JPanel p2 = new JPanel();
+        p2.add(output);
 
+        textPanel.setLayout(new BorderLayout());
+
+        JPanel right = new JPanel(new BorderLayout());
+        right.add(p2, BorderLayout.LINE_END);
+
+        verticalOutput.add(right);
+        verticalOutput.add(Box.createVerticalStrut(15));
+
+        textPanel.add(verticalOutput, BorderLayout.PAGE_START);
+
+        repaint();
+        invalidate();
+        validate();
     }
     public static void main(String[] args) {
         new Server();
