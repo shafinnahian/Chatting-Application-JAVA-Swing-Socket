@@ -77,8 +77,27 @@ public class Server extends JFrame implements ActionListener {
         userStatus.setFont(new Font("SAN SERIF", Font.BOLD, 14));
         panelServer.add(userStatus);
 
-        setSize(450, 700);
+        // add texting panel
+        JPanel textPanel = new JPanel();
+        textPanel.setBounds(5, 75, 425, 570);
+        add(textPanel);
+
+        JTextField text1 = new JTextField();    // creates a textfield to write texts
+        text1.setBounds(5, 665, 310, 40);
+        text1.setFont(new Font("SAN SERIF", Font.PLAIN, 16));
+        add(text1);
+
+        // create a button to send texts
+        JButton send = new JButton("Send");
+        send.setBounds(320, 665, 123, 40);
+        send.setBackground(new Color(2, 89, 47));
+        send.setForeground(Color.WHITE);
+        send.setFont(new Font("Sans Serif", Font.BOLD, 18));
+        add(send);
+
+        setSize(450, 710);
         setLocation(200, 200);
+        setUndecorated(true);
         getContentPane().setBackground(Color.WHITE);
 
         setVisible(true);
