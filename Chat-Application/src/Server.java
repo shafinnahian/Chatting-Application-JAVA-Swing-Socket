@@ -7,23 +7,28 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class Server extends JFrame implements ActionListener {
+public class Server implements ActionListener {
 
     JTextField text1;
     JPanel textPanel;
-    Box verticalOutput = Box.createVerticalBox();
+    static Box verticalOutput = Box.createVerticalBox();
+
+    static DataOutputStream dout;
+
+    static JFrame frame = new JFrame();
     Server(){
-        setLayout(null);
+        frame.setLayout(null);
 
         JPanel panelServer = new JPanel();
         panelServer.setBackground(new Color(2, 89, 47));
         panelServer.setBounds(0, 0, 450, 70);
         panelServer.setLayout(null);
-        add(panelServer);
+        frame.add(panelServer);
 
         // back logo w/ exit response
         ImageIcon image1 = new ImageIcon(ClassLoader.getSystemResource("images/arrow2.png"));
@@ -89,12 +94,12 @@ public class Server extends JFrame implements ActionListener {
         // add texting panel
         textPanel = new JPanel();
         textPanel.setBounds(5, 75, 425, 570);
-        add(textPanel);
+        frame.add(textPanel);
 
         text1 = new JTextField();    // creates a textfield to write texts
         text1.setBounds(5, 665, 310, 40);
         text1.setFont(new Font("SAN SERIF", Font.PLAIN, 16));
-        add(text1);
+        frame.add(text1);
 
         // create a button to send texts
         JButton send = new JButton("Send");
@@ -105,35 +110,41 @@ public class Server extends JFrame implements ActionListener {
 
         send.addActionListener(this);
 
-        add(send);
+        frame.add(send);
 
-        setSize(450, 710);
-        setLocation(200, 200);
-        setUndecorated(true);
-        getContentPane().setBackground(Color.WHITE);
+        frame.setSize(450, 710);
+        frame.setLocation(200, 200);
+        frame.setUndecorated(true);
+        frame.getContentPane().setBackground(Color.WHITE);
 
-        setVisible(true);
+        frame.setVisible(true);
     }
 
     public void actionPerformed (ActionEvent ae){
-        String out = text1.getText();
-        JPanel p2 = formatLabel(out);
+        try {
+            String out = text1.getText();
+            JPanel p2 = formatLabel(out);
 
-        textPanel.setLayout(new BorderLayout());
+            textPanel.setLayout(new BorderLayout());
 
-        JPanel right = new JPanel(new BorderLayout());
-        right.add(p2, BorderLayout.LINE_END);
+            JPanel right = new JPanel(new BorderLayout());
+            right.add(p2, BorderLayout.LINE_END);
 
-        verticalOutput.add(right);
-        verticalOutput.add(Box.createVerticalStrut(15));
+            verticalOutput.add(right);
+            verticalOutput.add(Box.createVerticalStrut(15));
 
-        textPanel.add(verticalOutput, BorderLayout.PAGE_START);
+            textPanel.add(verticalOutput, BorderLayout.PAGE_START);
 
-        text1.setText("");  // empties the input bar after each message
+            dout.writeUTF(out);   // to send the message to other user
 
-        repaint();
-        invalidate();
-        validate();
+            text1.setText("");  // empties the input bar after each message
+
+            frame.repaint();
+            frame.invalidate();
+            frame.validate();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static JPanel formatLabel(String out){
@@ -162,21 +173,27 @@ public class Server extends JFrame implements ActionListener {
     public static void main(String[] args) {
         new Server();
 
-//        try{
-//            ServerSocket skt = new ServerSocket(6001);
-//
-//            while (true){
-//                Socket s = skt.accept();
-//                DataInputStream din = new DataInputStream(s.getInputStream());  // takes the input of socket
-//                DataOutputStream dout = new DataOutputStream(s.getOutputStream());
-//
-//                while (true){
-//                    String messageRead = din.readUTF(); // reads the message of DataInputStream object
-//                    JPanel panel = formatLabel()
-//                }
-//            }
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
+        try{
+            ServerSocket skt = new ServerSocket(6001);
+
+            while (true){
+                Socket s = skt.accept();
+                DataInputStream din = new DataInputStream(s.getInputStream());  // takes the input of socket
+                dout = new DataOutputStream(s.getOutputStream());
+
+                while (true){
+                    String messageRead = din.readUTF(); // reads the message of DataInputStream object
+                    JPanel panel = formatLabel(messageRead);
+
+                    JPanel left = new JPanel(new BorderLayout());
+                    left.add(panel, BorderLayout.LINE_START);
+
+                    verticalOutput.add(left);   // this is why we made the object static
+                    frame.validate();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
